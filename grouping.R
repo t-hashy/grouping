@@ -52,12 +52,12 @@ sheet.students <- read_sheet(SSID_SURVEY, SHTNAME_STUDENTS)
 sheet.dd1.raw <- read_sheet(SSID_SURVEY, SHTNAME_DD1_SURVEY)
 
 # # Join the data
-sheet.form <- left_join( sheet.students, sheet.form.raw |> select(!タイムスタンプ))
-sheet.dd1 <- left_join( sheet.students, sheet.dd1.raw |> select(!c(タイムスタンプ, 名前)))
+sheet.form <- left_join( sheet.students, sheet.form.raw |> select(!Timestamp))
+sheet.dd1 <- left_join( sheet.students, sheet.dd1.raw |> select(!c(Timestamp, name))
 
 # Get the short_names
-shortNames <- unique(sheet.students$省略名_かな漢字)
-numberOfResponses <- length(sheet.form$タイムスタンプ)
+shortNames <- unique(sheet.students$shortname)
+numberOfResponses <- length(sheet.form$Timestamp)
 
 
 # Calculate cosine similarity ----
@@ -65,13 +65,13 @@ numberOfResponses <- length(sheet.form$タイムスタンプ)
 ## Absentables ----
 df.absentable <- sheet.students |>
   mutate(
-    absentable = ifelse(名前 %in% ABSENTABLES, TRUE, FALSE)
+    absentable = ifelse(name %in% ABSENTABLES, TRUE, FALSE)
   ) |>
-  select(name = 省略名_かな漢字, absentable)
+  select(name = shortname, absentable)
 
 ## Gender ----
 df.gender <- sheet.students |>
-  select(name = "省略名_かな漢字", gender = 性別) |>
+  select(name = shortname, gender) |>
   mutate(gender = as.factor(gender))
 cs.gender <- df.gender |>
   table() |>
@@ -81,12 +81,12 @@ cs.gender <- df.gender |>
 
 ## Rolls ----
 df.roll <- sheet.form |>
-  select(name =省略名_かな漢字, roll = 自分の特性) |>
+  select(name = shortname, roll = characteristics) |>
   mutate(
     roll = stringi::stri_match_first_regex(roll, "(.*?)：")[,2]
   ) |>
   mutate(
-    roll = ifelse(is.na(roll), "なんでも屋", roll)
+    roll = ifelse(is.na(roll), "any", roll)
   )
 df.roll |> table() |> colSums()
 
@@ -97,7 +97,7 @@ cs.roll <- df.roll |>
 
 ## Preference  ----
 df.pref <- sheet.form |>
-  select(name = 省略名_かな漢字, preference = 好きな進め方) |>
+  select(name = shortname, preference = preferences) |>
   separate_rows(preference, sep = ",") |>
   mutate(
     preference = stringi::stri_match_first_regex(preference, "(.*?)：")[,2]
@@ -111,7 +111,7 @@ cs.pref[is.nan(cs.pref)] <- 0
 
 ## Member ----
 df.member <- sheet.form |>
-  select(name = 省略名_かな漢字, member = 一緒にやりたい人)
+  select(name = shortname, member = selected_one)
 cs.member <- df.member |>
   table() |>
   t() |>
@@ -120,7 +120,7 @@ cs.member[is.nan(cs.member)] <- 0
 
 ## Themes ----
 df.theme.raw <- left_join(sheet.form, sheet.dd1) |>
-  select(name = "省略名_かな漢字" , themes = やりたいテーマ, like1 = `好きなものは何ですか？（1つ目）`, like2 = `好きなものは何ですか？（2つ目）`, like3 = `好きなものは何ですか？（3つ目）`) |>
+  select(name = shortname , themes, like1, like2, like3) |>
   mutate(
     themes = paste(themes, like1, like2, like3, sep = "、")
   ) |>
@@ -292,7 +292,7 @@ df.check <- left_join(df.res, df.absentable) |>
   left_join(df.roll) |>
   left_join(df.gender)
 df.check |> filter(absentable == TRUE) # Not in the same group
-df.check |> filter(roll == "リーダー") # Not in the same group
+df.check |> filter(roll == "leader") # Not in the same group
 df.check$roll[duplicated(df.check |> select(group, roll))] |> unique() # No duplication in leader or subleader
 df.check |> filter(gender == "male") |> select(group) |> table() |> max() # Should be less than or equal to 2
 
