@@ -32,11 +32,11 @@ library(stats)
 
 # Gppgle
 SSID_SURVEY <- Sys.getenv("SSID_SURVEY_RESPONSES")
-SSID_GROUPS <- Sys.getenv("SSID_GROUPS")
+SSID_GROUPS <- Sys.getenv("SSID_OUTPUT")
 SHTNAME_FORM <- "form"
-SHTNAME_STUDENTS <- "students"
+SHTNAME_STUDENTS <- "respondees"
 SHTNAME_THEMES <- "themes"
-SHTNAME_DD1_SURVEY <- "dd1_survey"
+SHTNAME_DD1_SURVEY <- "anothersurvey"
 
 # Grouping
 MEMBERS_PER_GROUP <- 4
