@@ -14,3 +14,8 @@ The main strategy is too simple to use just cosine similarity, which seems far f
 7. Merge matrixes (precisely `1 - cosine similarity` matries because of converting them into distance) with mulplying weiths and diversity.
 8. Clustering from nearest ones to farest ones, one by one.
 9. Check conditions, and export if needed.
+
+## Notaions
+- Main survey has 4 questions which is included in this formula.
+- Sub survey has only 1 question item which is used at this time, because sub-survey has been made for another purpose and I just borrow the part of it for my usage.
+- Variable names is not important and for my time saving, I uploaded raghly the same. Please not mind.
